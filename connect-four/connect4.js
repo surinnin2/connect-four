@@ -8,7 +8,7 @@
 const WIDTH = 7;
 const HEIGHT = 6;
 
-let currPlayer = 1; // active player: 1 or 2
+let currPlayer = 'p1'; // active player: 1 or 2
 const board = []; // array of rows, each row is array of cells  (board[y][x])
 
 /** makeBoard: create in-JS board structure:
@@ -16,12 +16,9 @@ const board = []; // array of rows, each row is array of cells  (board[y][x])
  */
 
 function makeBoard() {
-  let initRow = []
-  for (i = 0; i < WIDTH; i++) {
-    initRow.push(undefined)
-  }
+  
   for (i = 0; i < HEIGHT; i++) {
-    board.push(initRow)
+    board.push(Array.from({ length: WIDTH}))
   }
 }
 
@@ -30,7 +27,7 @@ function makeBoard() {
 
 function makeHtmlBoard() {
   // TODO: get "htmlBoard" variable from the item in HTML w/ID of "board"
-  const board = document.querySelector('#board')
+  const htmlBoard = document.querySelector('#board')
   // TODO: add comment for this code
   // creates a variable top with a new table row element
   const top = document.createElement("tr");
@@ -45,7 +42,7 @@ function makeHtmlBoard() {
     headCell.setAttribute("id", x);
     top.append(headCell);
   }
-  board.append(top);
+  htmlBoard.append(top);
 
   // create new table row elements (based on height) and create new table data cell elements (based on width) with an id of incrementing xy coordinates and append the tds to each row and each row to the htmlboard
   for (var y = 0; y < HEIGHT; y++) {
@@ -55,7 +52,7 @@ function makeHtmlBoard() {
       cell.setAttribute("id", `${y}-${x}`);
       row.append(cell);
     }
-    board.append(row);
+    htmlBoard.append(row);
   }
 }
 
@@ -78,7 +75,7 @@ function placeInTable(y, x) {
   // TODO: make a div and insert into correct table cell
   const piece = document.createElement('div')
   piece.classList.add('piece')
-  piece.classList.add(`p${currPlayer}`)
+  piece.classList.add(currPlayer)
   piece.style.top = -50 * (y + 2);
 
   const spot = document.getElementById(`${y}-${x}`)
@@ -88,6 +85,9 @@ function placeInTable(y, x) {
 /** endGame: announce game end */
 
 function endGame(msg) {
+  setTimeout(() => {
+    alert(msg)
+  }, 100)
   // TODO: pop up alert message
 }
 
@@ -117,15 +117,15 @@ function handleClick(evt) {
   }
 
   // check for tie
-  if (board.every((val) => {
-    val.every((space) => space)
-  } )) {
+  if (board.every(val => {
+    return val.every((space) => space)}
+    )) {
     return endGame("Tie Game")
   }
   // TODO: check if all cells in board are filled; if so call, call endGame
 
   // switch players
-  currPlayer = (currPlayer === 1) ? 2 : 1
+  currPlayer = (currPlayer === 'p2') ? 'p1' : 'p2'
   // TODO: switch currPlayer 1 <-> 2
 }
 
@@ -148,14 +148,18 @@ function checkForWin() {
   }
 
   // TODO: read and understand this code. Add comments to help you.
-
+  //iterating through all possible x,y coordinates by looping through all y and all x of y
   for (var y = 0; y < HEIGHT; y++) {
     for (var x = 0; x < WIDTH; x++) {
+      //assigns horiz to be an array of spots with same y but incrementing x values
       var horiz = [[y, x], [y, x + 1], [y, x + 2], [y, x + 3]];
+      //assigns vert to be an array of spots with same x but incrementing y values
       var vert = [[y, x], [y + 1, x], [y + 2, x], [y + 3, x]];
+      //assigns diagDR to be an array of spots with directly proportional incrementing x and y values
       var diagDR = [[y, x], [y + 1, x + 1], [y + 2, x + 2], [y + 3, x + 3]];
+      //assigns diagDL to be an array of spots with inversely proportional incrementing x and y values
       var diagDL = [[y, x], [y + 1, x - 1], [y + 2, x - 2], [y + 3, x - 3]];
-
+      //checks is there is a win in any of the 4 arrays for each spot
       if (_win(horiz) || _win(vert) || _win(diagDR) || _win(diagDL)) {
         return true;
       }
